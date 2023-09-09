@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %}
+<div class="container">
+	<div class="row">
+		<video width="500" height="380" class="center" autoplay loop>
+			<source src= "{% static 'Hello.mp4' %}" type="video/mp4">
+			Your browser does not support the video tag.
+		</video>
+		<div class="form-style mt-5" align="middle" >
+			<a href="{% url 'animation' %}"><button class="btn btn-info">Click to Start</button></a>
+		</div>
+	</div>
+</div>
+{% endblock %}

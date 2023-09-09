@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- <div class="grid-template-columns: 1fr 2fr;"> -->
+<div class="d-grid gap-3" style="grid-template-columns: 1fr 1fr;">
+	<div class="bg-body-tertiary border rounded-3">
+		<div id="scrollable-div">
+			<div class="container">
+				<h2 class="text-center mt-2">Upload the audio</h2>
+				<form method="post" enctype="multipart/form-data">
+					{% csrf_token %}
+						<div class="mb-3">
+							<input type="file" name="audio_file" class="form-control">
+							<input class="form-control" aria-label="With textarea" type="hidden" name="file_type" class="mytext"
+								value="audio" placeholder=""/>
+						</div>
+						<button type="submit" class="'btn btn-info rounded-pill px-3 align-center">Submit</button>
+				</form>
+			</div>
+			<hr>
+			<div class="container align-center mb-4">
+				<h2 class="text-center mt-2">Record your speech</h2>
+				<form action="" class="form-row align-items-center" method="post">
+					{% csrf_token %}
+
+						<div class="form-row align-items-center mb-3">
+							<div class="input-group">
+								<input class="form-control" aria-label="With textarea" type="text" name="" class="mytext"
+									id="speechToText" placeholder="" disabled/>
+								<input class="form-control" aria-label="With textarea" type="hidden" name="sen" class="mytext"
+									id="speechToTextHidden" placeholder=""/>
+
+								<div class="input-group-prepend">
+									<span class="input-group-text" onclick="record()">
+										<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-mic-fill"
+											viewBox="0 0 16 16">
+											<path d="M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0V3z" />
+											<path
+												d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z" />
+										</svg>
+									</span>
+								</div>
+							</div>
+						</div>
+
+						<button type="submit" name="submit" class="submit btn btn-primary rounded-pill px-3 align-center">
+							Submit
+						</button>
+						<button class="submit btn btn-primary rounded-pill px-3 align-center" type="button" onclick="record()">
+							<span class="" aria-hidden="true">Record</span>
+							<span><i class="bi bi-mic-fill"></i></span>
+						</button>
+				</form>
+			</div>
+				<!-- </div> -->
+				
+
+			
+
+			<!-- 
+			<hr>
+				<div class="container">
+				<h2 class="text-center mt-2">Upload the video file</h2>
+				<form method="post" enctype="multipart/form-data">
+					{% csrf_token %}
+						<div class="mb-3">
+							<input type="file" name="video_file" class="form-control">
+							<input type="text" name="test_field" class="form-control">
+							<input class="form-control" aria-label="With textarea" type="hidden" name="file_type" class="mytext"
+								value="video" placeholder=""/>
+						</div>
+						<button type="submit" class="'btn btn-info rounded-pill px-3 align-center">Submit Videofile</button>
+				</form>
+			</div> 
+			<hr>
+		-->
+			
+			{% if words %}
+			<div class="container mt-2 mb-4">
+				<h2 class="text-center mt-2"></h2>
+				<!-- <table cellspacing="20px"> -->
+				<div class ="row">
+					<div class="col-sm-4"><b>The text that you entered is: </b></div>
+					<div class="col-sm-8">{{ text }}</div>
+				</div>
+				
+				<div class="row">
+					{% if temp_file_path %}
+						<div class="col-sm-4"> </b> Video is ready to be played. Please click on Play</div>
+						<div class="col-sm-8">
+							<audio controls id="audio-play" onclick="playerAudioVideo()">
+								<source src="/{{ temp_file_path }}" type="audio/wav">
+								Your browser does not support the audio element.
+							</audio>
+						</div>
+					{% endif %}
+
+					<div>
+						<ul class="td" id="list" class="text-center">
+							{% for word in words %}
+								<li id="{{ i }}" style="margin-right: 8px" hidden="true">{{ word }}</li>
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+			</div>
+			{% endif %}
+	 </div>
+	</div>
+
+	<div class="bg-body-tertiary border rounded-3">
+		<h2 class="text-center mt-2">GestureBot</h2>
+
+		<div class="row container ">
+				{% if words %}
+					<button class="submit btn btn-success rounded-pill px-3" onclick="playerAudioVideo()">Play</button>
+					<div class="row mt-2">
+						<video controls width="600" height="350" id="video-play" onclick="playerAudioVideo()">
+							<source src="/temp/merged_video.mp4" type="">
+							Your browser does not support HTML5 video.
+						</video>
+					</div>	
+				{% endif %}
+
+			<div class="row mb-4"></div>
+			
+		</div>
+		<div class="row"></div>
+
+	</div>
+</div>
+
+	<script>
+		//webkitSpeechRecognition api for speech to text conversion
+		function record(){
+			var recognition = new webkitSpeechRecognition();
+			recognition.lang='en-IN';
+			recognition.onresult = function(event){
+				document.getElementById('speechToText').value = event.results[0][0].transcript;
+				document.getElementById('speechToTextHidden').value = event.results[0][0].transcript;
+			}
+			recognition.start();
+		}
+
+		function playerAudioVideo() {
+			var video_player = document.getElementById('video-play');
+			var audio_player = document.getElementById('audio-play');
+			video_player.playbackRate = 1.5;
+			if(audio_player) {
+				audio_player.play();
+			}
+			video_player.play();
+		}
+
+
+		function play()
+		{
+			var audio = document.getElementById("audio-play");
+						
+			var videoSource = new Array();
+			var	videos = document.getElementById("list").getElementsByTagName("li");
+			var j;
+			for(j=0;j<videos.length;j++)
+			{
+				videoSource[j] = "/static/" + videos[j].innerHTML +".mp4";
+			}
+
+			var i = 0; // define i
+			var videoCount = videoSource.length;
+			audio.play();
+			function videoPlay(videoNum)
+			{
+				document.getElementById("list").getElementsByTagName("li")[videoNum].style.color = "#09edc7";
+				document.getElementById("list").getElementsByTagName("li")[videoNum].style.fontSize = "xx-large";
+				document.getElementById("videoPlayer").setAttribute("src", videoSource[videoNum]);
+					document.getElementById("videoPlayer").load();
+					document.getElementById("videoPlayer").play();
+
+			}
+			document.getElementById('videoPlayer').addEventListener('ended', myHandler, false);
+			document.getElementById("list").getElementsByTagName("li")[0].style.color = "#09edc7";
+			document.getElementById("list").getElementsByTagName("li")[0].style.fontSize = "xx-large";
+			
+			videoPlay(0); // play the video
+
+			function myHandler()
+			{
+				document.getElementById("list").getElementsByTagName("li")[i].style.color = "#feda6a";
+				document.getElementById("list").getElementsByTagName("li")[i].style.fontSize = "20px";
+				i++;
+					if (i == videoCount)
+					{
+								document.getElementById("videoPlayer").pause();
+					}
+					else
+					{
+							videoPlay(i);
+					}
+			}
+		}
+		
+		function playPause(){
+				if (document.getElementById("videoPlayer").paused){
+					play();}
+				else{
+					document.getElementById("videoPlayer").pause();}
+			}
+
+		</script>
+</div>
+
+{% endblock %}
